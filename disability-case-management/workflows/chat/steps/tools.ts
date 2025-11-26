@@ -1,5 +1,9 @@
 import { FatalError } from 'workflow';
 import { z } from 'zod';
+import { nanoid } from 'nanoid';
+
+// Time constants for better readability
+const DAYS_TO_MS = 24 * 60 * 60 * 1000;
 
 // Mock data for case statuses and types
 export const caseStatuses = [
@@ -78,8 +82,8 @@ export async function createCase({
   // Simulate processing
   await new Promise((resolve) => setTimeout(resolve, 800));
 
-  // Generate case ID
-  const caseId = `DC${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+  // Generate case ID using nanoid for uniqueness
+  const caseId = `DC${nanoid(10).toUpperCase()}`;
   const filingDate = new Date().toISOString();
   
   // Assign a caseworker based on disability type
@@ -131,14 +135,14 @@ export async function checkCaseStatus({ caseId }: { caseId: string }) {
   const assignedCaseworkerId = caseworkerIds[Math.floor(Math.random() * caseworkerIds.length)];
   const assignedCaseworker = mockCaseworkers[assignedCaseworkerId];
 
-  // Generate dates
-  const filingDate = new Date(Date.now() - Math.random() * 180 * 24 * 60 * 60 * 1000); // Within last 6 months
-  const lastUpdated = new Date(Date.now() - Math.random() * 14 * 24 * 60 * 60 * 1000); // Within last 2 weeks
+  // Generate dates using named constants
+  const filingDate = new Date(Date.now() - Math.random() * 180 * DAYS_TO_MS); // Within last 6 months
+  const lastUpdated = new Date(Date.now() - Math.random() * 14 * DAYS_TO_MS); // Within last 2 weeks
   
   // Estimated completion based on status
   const estimatedCompletion = status === 'Approved' || status === 'Denied' || status === 'Closed'
     ? null
-    : new Date(Date.now() + Math.random() * 90 * 24 * 60 * 60 * 1000);
+    : new Date(Date.now() + Math.random() * 90 * DAYS_TO_MS);
 
   return {
     caseId: caseId.toUpperCase(),
@@ -151,7 +155,7 @@ export async function checkCaseStatus({ caseId }: { caseId: string }) {
       id: assignedCaseworkerId,
       name: assignedCaseworker.name,
       department: assignedCaseworker.department,
-      phone: '1-800-555-0' + Math.floor(Math.random() * 900 + 100),
+      phone: '(555) 000-' + String(Math.floor(Math.random() * 9000 + 1000)),
     },
     pendingActions: status === 'Documentation Required'
       ? ['Submit medical records', 'Complete employment history form']
@@ -185,7 +189,7 @@ export async function updateCase({
     );
   }
 
-  const updateId = `UPD${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+  const updateId = `UPD${nanoid(8).toUpperCase()}`;
   const timestamp = new Date().toISOString();
 
   return {
@@ -276,7 +280,7 @@ export async function addDocumentation({
   // Simulate processing
   await new Promise((resolve) => setTimeout(resolve, 500));
 
-  const documentId = `DOC${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+  const documentId = `DOC${nanoid(8).toUpperCase()}`;
   const uploadDate = new Date().toISOString();
 
   return {
@@ -323,14 +327,14 @@ export async function scheduleAppointment({
     throw new Error('Scheduling conflict. Please try a different date or time.');
   }
 
-  const appointmentId = `APT${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+  const appointmentId = `APT${nanoid(8).toUpperCase()}`;
   
   // Generate appointment date (preferredDate or random future date)
   let appointmentDate: Date;
   if (preferredDate) {
     appointmentDate = new Date(preferredDate);
   } else {
-    appointmentDate = new Date(Date.now() + (7 + Math.random() * 21) * 24 * 60 * 60 * 1000);
+    appointmentDate = new Date(Date.now() + (7 + Math.random() * 21) * DAYS_TO_MS);
   }
 
   // Set time

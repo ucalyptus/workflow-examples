@@ -275,9 +275,19 @@ function renderToolOutput(part: any) {
   if (!partOutput) {
     return null;
   }
-  const parsedPartOutput = JSON.parse(partOutput);
-  const output = parsedPartOutput.output.value;
-  const parsedOutput = JSON.parse(output);
+  
+  let parsedOutput: any;
+  try {
+    const parsedPartOutput = JSON.parse(partOutput);
+    const output = parsedPartOutput.output?.value;
+    if (!output) {
+      return <div className="text-sm text-muted-foreground">No output available</div>;
+    }
+    parsedOutput = JSON.parse(output);
+  } catch (error) {
+    console.error('Failed to parse tool output:', error);
+    return <div className="text-sm text-destructive">Error parsing output</div>;
+  }
 
   switch (part.type) {
     case "tool-createCase": {
